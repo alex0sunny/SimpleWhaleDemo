@@ -3,8 +3,6 @@ name: CI to Docker Hub
 on:
   push:
     branches: [ main ]
-    tags:
-      - "v*.*.*"
   workflow_dispatch:
 
 
@@ -26,11 +24,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Login to Docker Hub
+      - name: Login to github registry
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         id: buildx
